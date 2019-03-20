@@ -9,6 +9,7 @@ html(lang="ru")
   body
     if username
       h2 Привет #{username}
+      a(class='button' href='/suggestions') Посмотреть список предложений 
     else  
       form(method='POST')
         input(type='text', name='username')

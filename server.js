@@ -2,6 +2,12 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const config = require("./config");
 const bodyParser = require("body-parser");
+const uuidv1 = require("uuid/v1");
+
+const suggestions = [
+  { id: "1", title: "Знакомство с сср" },
+  { id: "2", title: "Знакомство с кралей" }
+];
 
 const server = express();
 
@@ -30,23 +36,28 @@ server.post("/", (req, res) => {
 });
 
 server.get("/suggestions", (req, res) => {
-  // показать список предложений
-  throw new Error("НЕ создано");
+  res.render("suggestions", {
+    suggestions
+  });
 });
 
-server.get("/suggestions:id", (req, res) => {
-  // показать одно предложение
-  throw new Error("НЕ создано");
+server.get("/suggestions/:id", (req, res) => {
+  console.log("slug", req.params.id);
+  const suggestion = suggestions.find(item => item.id == req.params.id);
+  res.render("suggestion", { suggestion });
 });
 server.post("/suggestions", (req, res) => {
   // создать предложение
-  // перенаправить на список
-  throw new Error("НЕ создано");
+  const title = req.body.title;
+
+  suggestions.push({
+    id: uuidv1(),
+    title
+  });
+  res.redirect("/suggestions");
 });
 server.post("/suggestions:id", (req, res) => {
   // проголосовать за предложение и перенаправить на предложение
-
-  throw new Error("НЕ создано");
 });
 
 server.listen(config.PORT, () =>
