@@ -5,8 +5,8 @@ const bodyParser = require("body-parser");
 const uuidv1 = require("uuid/v1");
 
 const suggestions = [
-  { id: "1", title: "Знакомство с сср" },
-  { id: "2", title: "Знакомство с кралей" }
+  { id: "1", title: "Знакомство с сср", voters: new Set() },
+  { id: "2", title: "Знакомство с кралей", voters: new Set() }
 ];
 
 const server = express();
@@ -17,18 +17,18 @@ server.use(bodyParser.urlencoded({ extended: true }));
 server.use(cookieParser());
 server.use(express.static("public"));
 
-server.get("/", (req, res) => {
-  console.log(req.cookies.username);
+server.use((req, res, next) => {
   const username = req.cookies.username;
+  req.username = username; // больше функции не знают, что юзернайм приходит из куков
+  res.locals.username = username; // locals метод объявляет локальные переменнные
+  next();
+});
 
-  res.render("index", {
-    username
-  });
-  //   res.sendFile("./index.html", { root: __dirname });
+server.get("/", (req, res) => {
+  res.render("index");
 });
 
 server.post("/", (req, res) => {
-  console.log(req.body.username);
   // устанавливаем куки принимают ключ-значение
   res.cookie("username", req.body.username);
   //   res.setHeader("Set-Cookie", ["username=kru1980"]);
@@ -42,22 +42,32 @@ server.get("/suggestions", (req, res) => {
 });
 
 server.get("/suggestions/:id", (req, res) => {
-  console.log("slug", req.params.id);
   const suggestion = suggestions.find(item => item.id == req.params.id);
+
   res.render("suggestion", { suggestion });
 });
 server.post("/suggestions", (req, res) => {
-  // создать предложение
   const title = req.body.title;
 
   suggestions.push({
     id: uuidv1(),
-    title
+    title,
+    voters: new Set()
   });
   res.redirect("/suggestions");
 });
-server.post("/suggestions:id", (req, res) => {
-  // проголосовать за предложение и перенаправить на предложение
+
+server.post("/suggestions/:id", (req, res) => {
+  const username = req.username;
+  const suggestion = suggestions.find(item => item.id == req.params.id);
+
+  if (suggestion.voters.has(username)) {
+    suggestion.voters.delete(username);
+  } else {
+    suggestion.voters.add(username);
+  }
+  // редирект на страницу откуда пришел запрос back
+  res.redirect(`back`);
 });
 
 server.listen(config.PORT, () =>

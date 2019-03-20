@@ -1,22 +1,17 @@
-doctype html
-html(lang="ru")  
-  head
-    meta(charset='UTF-8')
-    meta(name='viewport', content='width=device-width, initial-scale=1.0')
-    meta(http-equiv='X-UA-Compatible', content='ie=edge')
-    title Document
-    link(rel="stylesheet", href="/style.css")
-  body
-    h2 Страница suggestion
-    if suggestions
-      ul  
-        for suggestion in suggestions
-          li
-            a(href=`/suggestions/${suggestion.id}`)= suggestion.title
-    else 
-      p данных нет
-
-    form(method="POST")
-      input(type="text" name="title" placeholder="Введите предложение")
-      br
-      button(type="submit") Добавить предложение
+extends layout
+block main
+  h2 Страница suggestion
+  if suggestions
+    ul  
+      for suggestion in suggestions
+        li
+          a(href=`/suggestions/${suggestion.id}`)= suggestion.title
+          | (#{suggestion.voters.size} )
+          form( method="post" action=`/suggestions/${suggestion.id}`)
+            button(type="submit")=suggestion.voters.has(username) ? "Отменить голос": "Проголосовать"
+  else 
+    p данных нет
+  form(method="POST")
+    input(type="text" name="title" placeholder="Введите предложение")
+    br
+    button(type="submit") Добавить предложение

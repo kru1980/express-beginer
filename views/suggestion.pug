@@ -1,17 +1,14 @@
-doctype html
-html(lang="ru")  
-  head
-    meta(charset='UTF-8')
-    meta(name='viewport', content='width=device-width, initial-scale=1.0')
-    meta(http-equiv='X-UA-Compatible', content='ie=edge')
-    title Document
-    link(rel="stylesheet", href="/style.css")
-  body
-      h2 Одно предложение
-      a(href="/suggestions") back
-      if suggestion
-        p Номер задачи
-          span= suggestion.id 
-        p= suggestion.title
-      else 
-        p Не найдено
+extends layout
+block main
+  h2 Одно предложение
+  h3 Проголосовавшие
+  ul
+    for voter in [...suggestion.voters]
+      li=voter 
+  a(href="/suggestions") back
+  p= suggestion.title
+  form(method="POST")
+    if suggestion.voters.has(username)
+      button(type="submit") Отменить голос 
+    else  
+      button(type="submit") Проголосовать
