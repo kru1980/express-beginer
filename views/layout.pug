@@ -7,4 +7,7 @@ html(lang="ru")
     title Document
     link(rel="stylesheet", href="/style.css")
 body
-    block main
+
+  if message
+    p(class="flash-message")= message
+  block main
